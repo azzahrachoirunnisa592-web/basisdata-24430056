@@ -17,3 +17,16 @@ CREATE TABLE IF NOT EXISTS barang (
     harga INT NOT NULL,
     stok INT DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tugas Modul 2: Buat tabel transaksi (Foreign Key)
+CREATE TABLE IF NOT EXISTS transaksi (
+    id_transaksi INT AUTO_INCREMENT PRIMARY KEY,
+    id_anggota VARCHAR(10),
+    tgl_transaksi DATETIME DEFAULT CURRENT_TIMESTAMP,
+    total_bayar INT DEFAULT 0,
+    FOREIGN KEY (id_anggota) REFERENCES anggota(id_anggota) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Modifikasi struktur tabel (ADD COLUMN & INDEX)
+ALTER TABLE barang ADD COLUMN kategori VARCHAR(50) AFTER nama_barang;
+CREATE INDEX idx_nama_barang ON barang(nama_barang);

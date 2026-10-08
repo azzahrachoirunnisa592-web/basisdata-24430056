@@ -5,3 +5,7 @@ CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE USER IF NOT EXISTS 'mhs_056'@'localhost' IDENTIFIED BY '<password_kerja>';
 GRANT ALL PRIVILEGES ON kopma_056.* TO 'mhs_056'@'localhost';
+
+-- Tugas Modul 1: Verifikasi lingkungan & hak akses
+SHOW DATABASES LIKE 'kopma_056';
+SHOW GRANTS FOR 'mhs_056'@'localhost';
