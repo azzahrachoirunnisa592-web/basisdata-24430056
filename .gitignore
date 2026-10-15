@@ -1,2 +1,5 @@
 *.env
 kredensial*.txt
+Web_kopma056/vendor/
+Web_kopma056/node_modules/
+Web_kopma056/.env
