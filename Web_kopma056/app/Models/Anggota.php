@@ -30,4 +30,19 @@ class Anggota extends Model
     {
         return $this->hasMany(Transaksi::class, 'id_anggota', 'id_anggota');
     }
+
+    public function simpanan(): HasMany
+    {
+        return $this->hasMany(Simpanan::class, 'id_anggota', 'id_anggota');
+    }
+
+    public function pinjaman(): HasMany
+    {
+        return $this->hasMany(Pinjaman::class, 'id_anggota', 'id_anggota');
+    }
+
+    public function shu(): HasMany
+    {
+        return $this->hasMany(Shu::class, 'id_anggota', 'id_anggota');
+    }
 }
