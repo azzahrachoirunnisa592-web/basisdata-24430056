@@ -77,98 +77,210 @@
             <span class="ml-auto text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded-full font-bold tracking-wider">v2.0</span>
         </div>
 
-        {{-- Navigasi Menu --}}
+        @php
+            $currentUser = auth()->user();
+            $currentRole = $currentUser ? $currentUser->role : 'admin';
+        @endphp
+
+        {{-- Navigasi Menu Berdasarkan Role --}}
         <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto custom-scrollbar text-[13px]">
 
-            {{-- === Menu Utama === --}}
-            <div class="px-2 pt-1 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menu Utama</div>
+            @if($currentRole === 'admin')
+                {{-- ========================================================
+                     1. ROLE ADMIN (ANNISA - 24430056): AKSES PENUH
+                ========================================================= --}}
+                <div class="px-2 pt-1 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menu Utama</div>
 
-            <a href="{{ route('dashboard') }}"
-               class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('dashboard') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fa-solid fa-chart-pie w-4 text-center {{ request()->routeIs('dashboard') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                <span>Dashboard Utama</span>
-            </a>
+                <a href="{{ route('dashboard') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('dashboard') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-chart-pie w-4 text-center {{ request()->routeIs('dashboard') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Dashboard Utama</span>
+                </a>
 
-            <a href="{{ route('anggota.dashboard') }}"
-               class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('anggota.dashboard') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fa-solid fa-id-card w-4 text-center {{ request()->routeIs('anggota.dashboard') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                <span>Dashboard Anggota</span>
-            </a>
+                <a href="{{ route('analisis.index') }}"
+                   class="nav-item flex items-center justify-between px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('analisis.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-brain w-4 text-center {{ request()->routeIs('analisis.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                        <span>Analisis Cerdas</span>
+                    </div>
+                    <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-bold">AI</span>
+                </a>
 
-            <a href="{{ route('analisis.index') }}"
-               class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('analisis.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-brain w-4 text-center {{ request()->routeIs('analisis.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                    <span>Analisis Cerdas</span>
-                </div>
-                <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-bold">AI</span>
-            </a>
+                <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Kasir & Penjualan</div>
 
-            {{-- === Kasir === --}}
-            <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Kasir & Penjualan</div>
+                <a href="{{ route('pos.index') }}"
+                   class="nav-item flex items-center justify-between px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('pos.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-cash-register w-4 text-center {{ request()->routeIs('pos.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                        <span>Transaksi Kasir (POS)</span>
+                    </div>
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                </a>
 
-            <a href="{{ route('pos.index') }}"
-               class="nav-item flex items-center justify-between px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('pos.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-cash-register w-4 text-center {{ request()->routeIs('pos.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                    <span>Transaksi Kasir (POS)</span>
-                </div>
-                <span class="flex h-2 w-2 relative">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-            </a>
+                <a href="{{ route('transaksi.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('transaksi.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-receipt w-4 text-center {{ request()->routeIs('transaksi.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Riwayat Transaksi</span>
+                </a>
 
-            <a href="{{ route('transaksi.index') }}"
-               class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('transaksi.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fa-solid fa-receipt w-4 text-center {{ request()->routeIs('transaksi.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                <span>Riwayat Transaksi</span>
-            </a>
+                <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Master Data</div>
 
-            {{-- === Master Data === --}}
-            <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Master Data</div>
+                <a href="{{ route('barang.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('barang.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-boxes-stacked w-4 text-center {{ request()->routeIs('barang.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Manajemen Barang</span>
+                </a>
 
-            <a href="{{ route('barang.index') }}"
-               class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('barang.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fa-solid fa-boxes-stacked w-4 text-center {{ request()->routeIs('barang.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                <span>Manajemen Barang</span>
-            </a>
+                <a href="{{ route('anggota.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('anggota.index') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-users w-4 text-center {{ request()->routeIs('anggota.index') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Data Anggota</span>
+                </a>
 
-            <a href="{{ route('anggota.index') }}"
-               class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('anggota.index') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fa-solid fa-users w-4 text-center {{ request()->routeIs('anggota.index') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                <span>Data Anggota</span>
-            </a>
+                <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pengaturan Sistem</div>
 
-            {{-- === Pengaturan === --}}
-            <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pengaturan</div>
+                <a href="{{ route('payment.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('payment.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-credit-card w-4 text-center {{ request()->routeIs('payment.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Payment Gateway</span>
+                    <span class="ml-auto text-[9px] bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded-full font-bold">Midtrans</span>
+                </a>
 
-            <a href="{{ route('payment.index') }}"
-               class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg font-semibold {{ request()->routeIs('payment.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fa-solid fa-credit-card w-4 text-center {{ request()->routeIs('payment.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
-                <span>Payment Gateway</span>
-                <span class="ml-auto text-[9px] bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1.5 py-0.5 rounded-full font-bold">Midtrans</span>
-            </a>
+            @elseif($currentRole === 'pengurus')
+                {{-- ========================================================
+                     2. ROLE PENGURUS (KELOLA KOPMA):
+                     Hanya menu pengelolaan koperasi:
+                     Dashboard Utama, Analisis Cerdas, Data Anggota, 
+                     Manajemen Barang, dan Riwayat Transaksi.
+                ========================================================= --}}
+                <div class="px-2 pt-1 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pengelolaan KOPMA</div>
+
+                <a href="{{ route('dashboard') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('dashboard') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-chart-pie w-4 text-center {{ request()->routeIs('dashboard') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Dashboard Utama</span>
+                </a>
+
+                <a href="{{ route('analisis.index') }}"
+                   class="nav-item flex items-center justify-between px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('analisis.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-brain w-4 text-center {{ request()->routeIs('analisis.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                        <span>Analisis Cerdas</span>
+                    </div>
+                    <span class="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-bold">AI</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Master Koperasi</div>
+
+                <a href="{{ route('anggota.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('anggota.index') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-users w-4 text-center {{ request()->routeIs('anggota.index') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Data Anggota</span>
+                </a>
+
+                <a href="{{ route('barang.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('barang.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-boxes-stacked w-4 text-center {{ request()->routeIs('barang.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Manajemen Barang</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Laporan & Audit</div>
+
+                <a href="{{ route('transaksi.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('transaksi.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-receipt w-4 text-center {{ request()->routeIs('transaksi.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Riwayat Transaksi</span>
+                </a>
+
+            @elseif($currentRole === 'kasir')
+                {{-- ========================================================
+                     3. ROLE KASIR (INPUT TRANSAKSI):
+                     Hanya modul operasional kasir:
+                     Transaksi Kasir (POS) dan Riwayat Transaksi.
+                ========================================================= --}}
+                <div class="px-2 pt-1 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Operasional Kasir</div>
+
+                <a href="{{ route('pos.index') }}"
+                   class="nav-item flex items-center justify-between px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('pos.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-cash-register w-4 text-center {{ request()->routeIs('pos.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                        <span>Transaksi Kasir (POS)</span>
+                    </div>
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                </a>
+
+                <a href="{{ route('transaksi.index') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('transaksi.*') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-receipt w-4 text-center {{ request()->routeIs('transaksi.*') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Riwayat Transaksi</span>
+                </a>
+
+            @elseif($currentRole === 'anggota')
+                {{-- ========================================================
+                     4. ROLE ANGGOTA (LIHAT SIMPANAN):
+                     Hanya modul portal anggota:
+                     Dashboard Anggota (simpanan pokok, wajib, sukarela, sisa pinjaman, SHU).
+                ========================================================= --}}
+                <div class="px-2 pt-1 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Portal Anggota</div>
+
+                <a href="{{ route('anggota.dashboard') }}"
+                   class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold {{ request()->routeIs('anggota.dashboard') ? 'bg-emerald-600/20 text-emerald-400 nav-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                    <i class="fa-solid fa-id-card w-4 text-center {{ request()->routeIs('anggota.dashboard') ? 'text-emerald-400' : 'text-slate-500' }}"></i>
+                    <span>Dashboard Anggota</span>
+                </a>
+
+            @endif
 
         </nav>
 
-        {{-- Profil Pengguna --}}
-        <div class="p-4 border-t border-white/5">
+        {{-- Profil Pengguna Berdasarkan Auth Session --}}
+        <div class="p-4 border-t border-white/5 bg-black/20">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-600 to-teal-500 flex items-center justify-center font-bold text-white text-sm flex-shrink-0 shadow-lg shadow-emerald-500/20">
-                    AN
+                @php
+                    $userName = $currentUser->name ?? 'Annisa Choirunnisa';
+                    $userInitial = strtoupper(substr($userName, 0, 2));
+                    $roleLabel = match($currentRole) {
+                        'admin'    => 'Administrator • 24430056',
+                        'pengurus' => 'Pengurus KOPMA',
+                        'kasir'    => 'Petugas Kasir',
+                        'anggota'  => 'Anggota Koperasi',
+                        default    => 'Pengguna'
+                    };
+                    $roleColor = match($currentRole) {
+                        'admin'    => 'text-emerald-400',
+                        'pengurus' => 'text-blue-400',
+                        'kasir'    => 'text-amber-400',
+                        'anggota'  => 'text-teal-400',
+                        default    => 'text-slate-400'
+                    };
+                    $dotColor = match($currentRole) {
+                        'admin'    => 'bg-emerald-400',
+                        'pengurus' => 'bg-blue-400',
+                        'kasir'    => 'bg-amber-400',
+                        'anggota'  => 'bg-teal-400',
+                        default    => 'bg-slate-400'
+                    };
+                @endphp
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-500 flex items-center justify-center font-bold text-white text-xs flex-shrink-0 shadow-lg shadow-emerald-500/20">
+                    {{ $userInitial }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="font-bold text-[12px] text-white truncate">Annisa Choirunnisa</div>
-                    <div class="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
-                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        NIM: 24430056
+                    <div class="font-bold text-[12px] text-white truncate">{{ $userName }}</div>
+                    <div class="text-[10px] {{ $roleColor }} font-mono flex items-center gap-1.5 mt-0.5 truncate">
+                        <span class="inline-block w-1.5 h-1.5 rounded-full {{ $dotColor }} animate-pulse flex-shrink-0"></span>
+                        <span class="truncate">{{ $roleLabel }}</span>
                     </div>
                 </div>
                 <form action="{{ route('logout') }}" method="POST" class="flex-shrink-0">
                     @csrf
-                    <button type="submit" title="Logout"
-                            class="w-8 h-8 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 flex items-center justify-center transition-all duration-150">
+                    <button type="submit" title="Keluar / Ganti Akun"
+                            class="w-8 h-8 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all duration-150">
                         <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
                     </button>
                 </form>

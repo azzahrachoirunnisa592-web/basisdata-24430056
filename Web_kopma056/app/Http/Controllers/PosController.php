@@ -10,6 +10,7 @@ use App\Models\DetailTransaksi;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
 class PosController extends Controller
@@ -18,7 +19,11 @@ class PosController extends Controller
     {
         $kategori = Kategori::all();
         $barang = Barang::with('kategori')->orderBy('nama_barang')->get();
-        $anggota = Anggota::where('status', 'aktif')->orderBy('nama')->get();
+        // Load anggota dengan no_hp, nim, nama untuk pencarian kasir instan
+        $anggota = Anggota::where('status', 'aktif')
+            ->select('id_anggota', 'nama', 'no_hp', 'nim', 'jurusan', 'status')
+            ->orderBy('nama')
+            ->get();
         $kasir = User::first();
 
         // Generate No Faktur Otomatis
@@ -30,7 +35,14 @@ class PosController extends Controller
         }
         $noFakturBaru = sprintf("TRX-%s-%03d", $today, $nextNumber);
 
-        return view('pos.index', compact('kategori', 'barang', 'anggota', 'kasir', 'noFakturBaru'));
+        $midtransConfig = [
+            'client_key'  => config('midtrans.client_key', env('MIDTRANS_CLIENT_KEY', '')),
+            'server_key'  => config('midtrans.server_key', env('MIDTRANS_SERVER_KEY', '')),
+            'snap_url'    => config('midtrans.snap_url', 'https://app.sandbox.midtrans.com/snap/snap.js'),
+            'environment' => config('midtrans.environment', env('MIDTRANS_ENV', 'sandbox')),
+        ];
+
+        return view('pos.index', compact('kategori', 'barang', 'anggota', 'kasir', 'noFakturBaru', 'midtransConfig'));
     }
 
     public function store(Request $request)
@@ -40,10 +52,11 @@ class PosController extends Controller
             'items' => 'required|array|min:1',
             'items.*.kode_barang' => 'required|exists:barang,kode_barang',
             'items.*.jumlah' => 'required|integer|min:1',
-            'nominal_uang' => 'required|numeric|min:0',
+            'nominal_uang' => 'nullable|numeric|min:0',
         ]);
 
         $kasir = User::first();
+        $metode = $request->input('metode_pembayaran', 'tunai');
 
         try {
             DB::beginTransaction();
@@ -76,13 +89,18 @@ class PosController extends Controller
 
             $diskon = intval($request->diskon ?? 0);
             $totalBayar = max(0, $totalBelanja - $diskon);
-            $nominalUang = intval($request->nominal_uang);
 
-            if ($nominalUang < $totalBayar) {
-                throw new \Exception("Nominal uang yang dibayarkan (Rp " . number_format($nominalUang, 0, ',', '.') . ") kurang dari total belanja (Rp " . number_format($totalBayar, 0, ',', '.') . ").");
+            // Jika non-tunai (QRIS / Midtrans / Debit / Bank VA), nominal uang sama dengan total bayar
+            if (in_array($metode, ['qris', 'midtrans', 'debit', 'va', 'bank_va'])) {
+                $nominalUang = $totalBayar;
+                $kembalian = 0;
+            } else {
+                $nominalUang = intval($request->nominal_uang ?? 0);
+                if ($nominalUang < $totalBayar) {
+                    throw new \Exception("Nominal uang yang dibayarkan (Rp " . number_format($nominalUang, 0, ',', '.') . ") kurang dari total belanja (Rp " . number_format($totalBayar, 0, ',', '.') . ").");
+                }
+                $kembalian = $nominalUang - $totalBayar;
             }
-
-            $kembalian = $nominalUang - $totalBayar;
 
             // 2. Simpan Transaksi Master
             $transaksi = Transaksi::create([
@@ -113,8 +131,11 @@ class PosController extends Controller
 
             DB::commit();
 
-            return redirect()->route('pos.receipt', $transaksi->id_transaksi)
-                ->with('success', "Transaksi {$transaksi->no_faktur} berhasil diproses dan stok barang telah dipotong otomatis!");
+            return redirect()->route('pos.receipt', [
+                'id'        => $transaksi->id_transaksi,
+                'metode'    => $metode,
+                'autoprint' => '1',
+            ])->with('success', "Transaksi {$transaksi->no_faktur} berhasil diproses dan stok barang telah dipotong otomatis!");
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -122,9 +143,77 @@ class PosController extends Controller
         }
     }
 
+    /**
+     * Generate Midtrans Snap Token untuk Pembayaran Digital di Kasir
+     */
+    public function createSnapToken(Request $request)
+    {
+        $request->validate([
+            'gross_amount' => 'required|numeric|min:100',
+            'order_id'     => 'required|string',
+            'customer_name' => 'nullable|string',
+            'customer_phone' => 'nullable|string',
+        ]);
+
+        $serverKey = config('midtrans.server_key', env('MIDTRANS_SERVER_KEY'));
+        $isProduction = config('midtrans.environment', env('MIDTRANS_ENV')) === 'production';
+        $apiUrl = $isProduction
+            ? 'https://app.midtrans.com/snap/v1/transactions'
+            : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
+
+        // Jika Server Key belum diset di admin, sediakan mode simulasi instan
+        if (empty($serverKey)) {
+            return response()->json([
+                'status'  => 'simulated',
+                'message' => 'Simulasi Midtrans Aktif (Isi Server Key di Pengaturan Admin untuk mode live)',
+                'token'   => 'SIMULATED-' . time() . '-' . rand(1000, 9999),
+            ]);
+        }
+
+        try {
+            $response = Http::withBasicAuth(trim($serverKey), '')
+                ->withHeaders([
+                    'Accept'       => 'application/json',
+                    'Content-Type' => 'application/json',
+                ])
+                ->timeout(10)
+                ->post($apiUrl, [
+                    'transaction_details' => [
+                        'order_id'     => $request->order_id . '-' . time(),
+                        'gross_amount' => (int) $request->gross_amount,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $request->customer_name ?: 'Pelanggan KOPMA',
+                        'phone'      => $request->customer_phone ?: '081234567890',
+                    ],
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json([
+                    'status'       => 'success',
+                    'token'        => $data['token'] ?? null,
+                    'redirect_url' => $data['redirect_url'] ?? null,
+                ]);
+            } else {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => $response->json()['error_messages'][0] ?? 'Respon error dari Midtrans Snap API',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Koneksi ke Midtrans gagal: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function receipt($id)
     {
         $transaksi = Transaksi::with(['anggota', 'kasir', 'details.barang'])->findOrFail($id);
-        return view('pos.receipt', compact('transaksi'));
+        $metodePembayaran = request('metode', 'tunai');
+        $autoPrint = request('autoprint', '0') === '1';
+        return view('pos.receipt', compact('transaksi', 'metodePembayaran', 'autoPrint'));
     }
 }

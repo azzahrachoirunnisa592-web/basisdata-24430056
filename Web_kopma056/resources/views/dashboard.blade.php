@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard — KOMPA')
-@section('header_title', '<i class="fa-solid fa-chart-pie text-emerald-500"></i> Dashboard Utama KOMPA')
+@section('header_title', 'Dashboard Utama KOMPA')
 
 @section('content')
 <div class="space-y-6">

@@ -32,6 +32,12 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+            $user = Auth::user();
+            if ($user->role === 'anggota') {
+                return redirect()->route('anggota.dashboard');
+            } elseif ($user->role === 'kasir') {
+                return redirect()->route('pos.index');
+            }
             return redirect()->intended(route('dashboard'));
         }
 
@@ -61,6 +67,11 @@ class AuthController extends Controller
         $creds = $roleMap[$role];
         if (Auth::attempt($creds)) {
             $request->session()->regenerate();
+            if ($role === 'anggota') {
+                return redirect()->route('anggota.dashboard');
+            } elseif ($role === 'kasir') {
+                return redirect()->route('pos.index');
+            }
             return redirect()->route('dashboard');
         }
 

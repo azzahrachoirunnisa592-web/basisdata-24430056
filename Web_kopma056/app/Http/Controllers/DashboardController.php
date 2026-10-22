@@ -13,6 +13,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Pengalihan otomatis sesuai hak akses peran
+        if (auth()->check()) {
+            if (auth()->user()->role === 'anggota') {
+                return redirect()->route('anggota.dashboard');
+            } elseif (auth()->user()->role === 'kasir') {
+                return redirect()->route('pos.index');
+            }
+        }
+
         // 1. Statistik Utama
         $totalPendapatan  = Transaksi::sum('total_bayar');
         $totalBarang      = Barang::count();

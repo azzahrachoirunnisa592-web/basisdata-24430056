@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Data Anggota')
-@section('header_title', 'Data Keanggotaan Koperasi Mahasiswa')
+@section('header_title', 'Data Anggota')
 
 @section('content')
 <div class="space-y-6">
@@ -11,7 +11,7 @@
         <form action="{{ route('anggota.index') }}" method="GET" class="flex flex-wrap items-center gap-3 flex-1">
             <div class="relative flex-1 min-w-[200px]">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, atau jurusan..." 
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, No. HP, NIM, atau jurusan..." 
                        class="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
             </div>
 

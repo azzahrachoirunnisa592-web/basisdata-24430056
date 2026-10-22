@@ -15,6 +15,7 @@ class AnggotaController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('no_hp', 'like', "%{$search}%")
                   ->orWhere('nim', 'like', "%{$search}%")
                   ->orWhere('jurusan', 'like', "%{$search}%")
                   ->orWhere('id_anggota', 'like', "%{$search}%");

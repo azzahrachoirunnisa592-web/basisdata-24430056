@@ -30,11 +30,23 @@
             @endif
         </form>
 
-        <a href="{{ route('pos.index') }}" 
-           class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 flex items-center gap-2 self-start sm:self-auto transition-colors">
-            <i class="fa-solid fa-cash-register"></i>
-            <span>Buka Kasir POS</span>
-        </a>
+        <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            <a href="{{ route('transaksi.export.print', request()->query()) }}" target="_blank"
+               class="px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5 transition-colors">
+                <i class="fa-solid fa-print text-slate-500"></i>
+                <span>Cetak / PDF</span>
+            </a>
+            <a href="{{ route('transaksi.export.csv', request()->query()) }}"
+               class="px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 border border-slate-200 flex items-center gap-1.5 transition-colors">
+                <i class="fa-solid fa-file-csv text-emerald-600"></i>
+                <span>Ekspor Excel/CSV</span>
+            </a>
+            <a href="{{ route('pos.index') }}" 
+               class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-cash-register"></i>
+                <span>Buka Kasir POS</span>
+            </a>
+        </div>
     </div>
 
     <!-- Tabel Riwayat Transaksi -->
